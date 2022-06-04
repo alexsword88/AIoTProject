@@ -6,13 +6,14 @@ name = "pypi"
 [packages]
 eel = "*"
 pyserial = "*"
+requests = "*"
 
 [dev-packages]
 autopep8 = "*"
 flake8 = "*"
 
 [requires]
-python_version = "3.10"
+python_version = "3"
 
 [scripts]
 start = "python main.py"

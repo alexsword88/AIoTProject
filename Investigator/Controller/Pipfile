@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+keyboard = "*"
+pyserial = "*"
+requests = "*"
+
+[dev-packages]
+flake8 = "*"
+autopep8 = "*"
+
+[requires]
+python_version = "3"
+
+[scripts]
+server = "python server.py"
+client = "python client.py"

@@ -3,6 +3,7 @@ import time
 from configparser import ConfigParser
 
 import eel
+import requests
 import serial
 
 config = ConfigParser()
@@ -12,10 +13,29 @@ MAX_TEMP = 10
 shutdown = False
 temperature = []
 triggerTemp = 0
+robotSending = False
+INVESTIGATE_ROBOT_IP = config["INVESTIGATE_ROBOT_IP"]
+INVESTIGATE_ROBOT_PORT = config["INVESTIGATE_ROBOT_PORT"]
+robotTriggerURL =  \
+    f"http://{INVESTIGATE_ROBOT_IP}:{INVESTIGATE_ROBOT_PORT}/openAir"
+robotStateURL =  \
+    f"http://{INVESTIGATE_ROBOT_IP}:{INVESTIGATE_ROBOT_PORT}/state"
 
 
 def calcTemp():
-    return "%.2f" % (sum(temperature) / len(temperature))
+    global robotSending, triggerOn
+    result = sum(temperature) / len(temperature)
+    if not robotSending:
+        if result > triggerTemp:
+            requests.get(robotTriggerURL)
+        robotSending = True
+        eel.onTriggerRaise()
+    else:
+        res = requests.get(robotTriggerURL)
+        if res.text == "OK":
+            robotSending = False
+            eel.onTriggerOff()
+    return "%.2f" % result
 
 
 def addTemp(temp):
@@ -47,7 +67,7 @@ def listenMicrobitSerialEvent(com, baudRate):
 
 
 def listenArduinoSerialEvent(com, baudRate):
-    global shutdown, temperature
+    global shutdown, temperature, triggerOn
     with serial.Serial(com, baudRate, timeout=0) as ser:
         time.sleep(2)  # wait arduino ready
         while not shutdown:

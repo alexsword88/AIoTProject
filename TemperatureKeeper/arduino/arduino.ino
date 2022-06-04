@@ -14,6 +14,12 @@ DHT dht(DHT_PIN, DHTTYPE);
 int triggerTemp = THRESHOLD_CONTROL_MIN;
 int sendTemp = 0;
 
+void clearSerial() {
+  while (Serial.available()) {
+    Serial.read();
+  }
+}
+
 void waitAck() {
   while (true) {
     if (Serial.available()) {
@@ -24,10 +30,10 @@ void waitAck() {
       }
     }
   }
-  Serial.flush();
+  clearSerial();
 }
 
-void sendTempHumd() {
+void sendTempeture() {
   float t = dht.readTemperature();
   if (isnan(t)) {
     return;
@@ -51,14 +57,14 @@ void sendThreshold() {
 void setup() {
   Serial.begin(9600);
   dht.begin();
-  sendTempHumd();
+  sendTempeture();
   sendThreshold();
 }
 
 void loop() {
   sendThreshold();
   if (sendTemp > 10) {
-    sendTempHumd();
+    sendTempeture();
     sendTemp = 0;
   }
   sendTemp += 1;

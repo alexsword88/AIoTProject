@@ -1,6 +1,6 @@
 # Requirement
 
-- python >= 3.10
+- python >= 3.8
 - [pipenv](https://pipenv.pypa.io/en/latest/)
 - change the `config.ini` from config.example.ini
 
