@@ -15,5 +15,5 @@ function onTriggerRaise() {
 
 eel.expose(onTriggerOff);
 function onTriggerOff() {
-  document.getElementById("trigger").style.color = "#FFF";
+  document.getElementById("trigger").style.color = "#000";
 }

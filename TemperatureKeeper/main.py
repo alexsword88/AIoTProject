@@ -1,6 +1,7 @@
 import threading
 import time
 from configparser import ConfigParser
+from tabnanny import check
 
 import eel
 import requests
@@ -12,8 +13,9 @@ config = config["server"]
 MAX_TEMP = 10
 shutdown = False
 temperature = []
-triggerTemp = 0
-robotSending = False
+triggerTemp = 255
+checkReady = True
+checkRobotState = False
 INVESTIGATE_ROBOT_IP = config["INVESTIGATE_ROBOT_IP"]
 INVESTIGATE_ROBOT_PORT = config["INVESTIGATE_ROBOT_PORT"]
 robotTriggerURL =  \
@@ -22,19 +24,27 @@ robotStateURL =  \
     f"http://{INVESTIGATE_ROBOT_IP}:{INVESTIGATE_ROBOT_PORT}/state"
 
 
+def checkReset():
+    global checkReady
+    checkReady = True
+
+
 def calcTemp():
-    global robotSending, triggerOn
+    global triggerOn, triggerTemp, checkRobotState, checkReady
     result = sum(temperature) / len(temperature)
-    if not robotSending:
+    if checkRobotState:
+        res = requests.get(robotStateURL)
+        if res.text == "OK":
+            checkRobotState = False
+            eel.onTriggerOff()
+    if checkReady:
         if result > triggerTemp:
             requests.get(robotTriggerURL)
-        robotSending = True
-        eel.onTriggerRaise()
-    else:
-        res = requests.get(robotTriggerURL)
-        if res.text == "OK":
-            robotSending = False
-            eel.onTriggerOff()
+            checkReady = False
+            checkRobotState = True
+            eel.onTriggerRaise()
+            t = threading.Timer(1800, checkReset)
+            t.start()
     return "%.2f" % result
 
 
@@ -67,7 +77,7 @@ def listenMicrobitSerialEvent(com, baudRate):
 
 
 def listenArduinoSerialEvent(com, baudRate):
-    global shutdown, temperature, triggerOn
+    global shutdown, temperature, triggerOn, triggerTemp
     with serial.Serial(com, baudRate, timeout=0) as ser:
         time.sleep(2)  # wait arduino ready
         while not shutdown:
