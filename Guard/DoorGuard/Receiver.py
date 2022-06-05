@@ -1,7 +1,7 @@
 import radio
 from microbit import *
 
-radio.config(group=223, power=2)
+radio.config(group=223, power=7)
 radio.on()
 uart.init(9600)
 

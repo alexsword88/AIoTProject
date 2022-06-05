@@ -32,15 +32,17 @@ def onShutDown(path, websocketList):
 def listenSearchEvent():
     global server, shutdown
     while not shutdown:
-        client, _ = server.accept()
-        data = client.recv(1)
-        if data == b'7':
-            time.sleep(0.5)
-            name = client.recv(1024)
-            name = name.decode().strip()
-            print(name)
-            eel.onFaceFound(name)
-        client.close()
+        try:
+            client, _ = server.accept()
+            data = client.recv(1)
+            if data == b'7':
+                time.sleep(0.5)
+                name = client.recv(1024)
+                name = name.decode().strip()
+                eel.onFaceFound(name)
+            client.close()
+        except:
+            pass
 
 def listenMicrobitSerialEvent(com, baudRate):
     global shutdown, temperature

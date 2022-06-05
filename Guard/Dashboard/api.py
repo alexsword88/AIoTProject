@@ -24,8 +24,14 @@ def foundPerson():
     image = face_recognition.load_image_file(file)
     faceLocation = face_recognition.face_locations(image)
     if len(faceLocation) > 0:
-        test_image_enc = face_recognition.face_encodings(image)[0]
-        name = faceModel.predict([test_image_enc])
+        test_image_enc = face_recognition.face_encodings(image)
+        closest_distances = faceModel.kneighbors(test_image_enc, n_neighbors=1)
+        are_matches = [closest_distances[0][i][0] <= 0.4
+                       for i in range(len(faceLocation))]
+        name = [(pred, loc) if rec else ("未知", loc)
+                for pred, loc, rec in zip(faceModel.predict(test_image_enc),
+                                          faceLocation, are_matches)]
+        name = name[0]
         client = socket.socket()
         client.connect(("127.0.0.1", config.getint("PORT")))
         client.send(b'7')
