@@ -1,7 +1,6 @@
 import threading
 import time
 from configparser import ConfigParser
-from tabnanny import check
 
 import eel
 import requests

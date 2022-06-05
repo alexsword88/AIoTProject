@@ -1,2 +1,10 @@
 **/.venv
 TemperatureKeeper/config.ini
+Investigator/EventTrigger/config.ini
+Investigator/Controller/config.ini
+Guard/Dashboard/config.ini
+Guard/Dashboard/face_recognition-1.3.0
+**/Pipfile.lock
+Guard/Dashboard/faceModel.pkl
+Guard/Dashboard/train_dir/D10907001
+Guard/Dashboard/web/target.jpg

@@ -2,9 +2,12 @@
 #define E2 6
 #define M1 4
 #define M2 7
-#define SPEED_STEP 10
+#define SPEED_UP_STEP 20
+#define SPEED_DOWN_STEP 30
+#define MAX_SPEED 100
 
 int SPEED = 0;
+int lastState = -1;
 
 void clearSerial(){
   while(Serial.available()){
@@ -12,14 +15,21 @@ void clearSerial(){
   }
 }
 
+void resetSpeed(int now){
+  if(lastState != now){
+    lastState = now;
+    SPEED = 0;
+  }
+}
+
 void speedUp() {
-  SPEED = min(SPEED + SPEED_STEP, 255);
+  SPEED = min(SPEED + SPEED_UP_STEP, MAX_SPEED);
   analogWrite(E1, SPEED);
   analogWrite(E2, SPEED);
 }
 
 void speedDown() {
-  SPEED = max(SPEED - SPEED_STEP, 0);
+  SPEED = max(SPEED - SPEED_DOWN_STEP, 0);
   analogWrite(E1, SPEED);
   analogWrite(E2, SPEED);
 }
@@ -33,24 +43,28 @@ void brake() {
 }
 
 void forward() {
-  speedUp();
-  digitalWrite(M1, HIGH);
-  digitalWrite(M2, HIGH);
-}
-
-void back() {
+  resetSpeed(0);
   speedUp();
   digitalWrite(M1, LOW);
   digitalWrite(M2, LOW);
 }
 
+void back() {
+  resetSpeed(1);
+  speedUp();
+  digitalWrite(M1, HIGH);
+  digitalWrite(M2, HIGH);
+}
+
 void left() {
+  resetSpeed(2);
   speedUp();
   digitalWrite(M1, LOW);
   digitalWrite(M2, HIGH);
 }
 
 void right() {
+  resetSpeed(3);
   speedUp();
   digitalWrite(M1, HIGH);
   digitalWrite(M2, LOW);
